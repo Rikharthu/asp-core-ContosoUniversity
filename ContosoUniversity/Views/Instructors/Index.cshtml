@@ -1,0 +1,126 @@
+@model ContosoUniversity.Models.SchoolViewModels.InstructorIndexData
+
+@{
+    ViewData["Title"] = "Instructors";
+}
+
+<h2>Instructors</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Last Name</th>
+            <th>First Name</th>
+            <th>Hire Date</th>
+            <th>Office</th>
+            <th>Courses</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var instructor in Model.Instructors)
+        {
+            string selectedRow = "";
+            if (instructor.ID == (int?)ViewData["InstructorID"])
+            {
+                selectedRow = "success"; // green highlight
+            }
+            <tr class="@selectedRow">
+                <td>
+                    @Html.DisplayFor(modelItem => instructor.LastName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => instructor.FirstMidName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => instructor.HireDate)
+                </td>
+                <td>
+                    @if (instructor.OfficeAssignment != null)
+                    {
+                        @instructor.OfficeAssignment.Location
+                    }
+                </td>
+                <td>
+                    @{
+                        foreach (var course in instructor.CourseAssignments)
+                        {
+                            @course.Course.CourseID @:  @course.Course.Title <br />
+                        }
+                    }
+                </td>
+                <td>
+                    <a asp-action="Index" asp-route-id="@instructor.ID">Select</a> |
+                    <a asp-action="Edit" asp-route-id="@instructor.ID">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@instructor.ID">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@instructor.ID">Delete</a>
+                </td>
+            </tr>
+                        }
+    </tbody>
+</table>
+
+@* If there are any courses (selected Instructor has courses) *@
+@if (Model.Courses != null)
+{
+    <h3>Courses Taught by Selected Instructor</h3>
+    <table class="table">
+        <tr>
+            <th></th>
+            <th>Number</th>
+            <th>Title</th>
+            <th>Department</th>
+        </tr>
+
+        @foreach (var course in Model.Courses)
+        {
+            string selectedRow = "";
+            if (course.CourseID == (int?)ViewData["CourseID"])
+            {
+                selectedRow = "success";
+            }
+            <tr class="@selectedRow">
+                <td>
+                    @Html.ActionLink("Select", "Index", new { courseID = course.CourseID })
+                </td>
+                <td>
+                    @course.CourseID
+                </td>
+                <td>
+                    @course.Title
+                </td>
+                <td>
+                    @course.Department.Name
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+
+@if (Model.Enrollments != null)
+{
+    <h3>
+        Students Enrolled in Selected Course
+    </h3>
+    <table class="table">
+        <tr>
+            <th>Name</th>
+            <th>Grade</th>
+        </tr>
+        @foreach (var enrollment in Model.Enrollments)
+        {
+            <tr>
+                <td>
+                    @enrollment.Student.FullName
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => enrollment.Grade)
+                </td>
+            </tr>
+        }
+    </table>
+}
